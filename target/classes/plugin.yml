@@ -1,0 +1,8 @@
+name: LockBlock
+version: '1.0'
+main: de.nick.lockBlock.LockBlock
+api-version: '1.21'
+authors: [ de.einniki ]
+
+commands:
+  lock:

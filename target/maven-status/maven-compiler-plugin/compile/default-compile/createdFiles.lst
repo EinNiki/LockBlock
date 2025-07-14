@@ -1,0 +1,5 @@
+de\nick\lockBlock\LockBlock.class
+de\nick\lockBlock\manager\CacheManager.class
+de\nick\lockBlock\manager\FileManager.class
+de\nick\lockBlock\command\LockBlockCommand.class
+de\nick\lockBlock\listener\PlayerListener.class

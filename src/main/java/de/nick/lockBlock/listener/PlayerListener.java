@@ -2,14 +2,22 @@ package de.nick.lockBlock.listener;
 
 import de.nick.lockBlock.LockBlock;
 import de.nick.lockBlock.manager.CacheManager;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.*;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.Random;
 
 
 public class PlayerListener implements Listener {
@@ -48,6 +56,7 @@ public class PlayerListener implements Listener {
     }
 
 
+
     @EventHandler
     public void onBlockPhysics(BlockPhysicsEvent event) {
         Location loc = event.getBlock().getLocation();
@@ -82,5 +91,120 @@ public class PlayerListener implements Listener {
         }
     }
 
+    /*
+
+        Totem OF Undying
+
+     */
+
+    @EventHandler
+    public void onPlayerPickupItem(PlayerAttemptPickupItemEvent event) {
+        ItemStack item = event.getItem().getItemStack();
+        setTotemName(item, event.getPlayer().getName());
+    }
+
+    @EventHandler
+    public void onDrop(PlayerDropItemEvent event) {
+        ItemStack item = event.getItemDrop().getItemStack();
+        resetTotemName(item);
+    }
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
+        if (event.getCurrentItem() == null) return;
+        if (event.getWhoClicked() instanceof Player player) {
+            if (event.getClickedInventory() != null && event.getCurrentItem().getType() == Material.TOTEM_OF_UNDYING) {
+                setTotemName(event.getCurrentItem(), player.getName());
+            }
+        }
+    }
+
+    public void setTotemName(ItemStack item, String playerName) {
+        if (item.getType() == Material.TOTEM_OF_UNDYING) {
+            ItemMeta meta = item.getItemMeta();
+            if (meta != null) {
+                meta.setDisplayName(getRandomColorCode() + "Totem von " + playerName);
+                item.setItemMeta(meta);
+            }
+        }
+    }
+
+    private void resetTotemName(ItemStack item) {
+        if (item.getType() == Material.TOTEM_OF_UNDYING) {
+            ItemMeta meta = item.getItemMeta();
+            if (meta != null) {
+                meta.setDisplayName(null);
+                item.setItemMeta(meta);
+            }
+        }
+    }
+
+    private static final ChatColor[] COLORS = {
+            ChatColor.BLACK, ChatColor.DARK_BLUE, ChatColor.DARK_GREEN, ChatColor.DARK_AQUA,
+            ChatColor.DARK_RED, ChatColor.DARK_PURPLE, ChatColor.GOLD, ChatColor.GRAY,
+            ChatColor.DARK_GRAY, ChatColor.BLUE, ChatColor.GREEN, ChatColor.AQUA,
+            ChatColor.RED, ChatColor.LIGHT_PURPLE, ChatColor.YELLOW, ChatColor.WHITE
+    };
+
+    private static final Random RANDOM = new Random();
+
+    private String getRandomColorCode() {
+        return COLORS[RANDOM.nextInt(COLORS.length)].toString();
+    }
+
+    /*
+
+    Ole Kick
+
+     */
+
+    private long nextKickTime = 0L;
+    private final Random random = new Random();
+
+    // Zufällige Zeit in Millisekunden (3 bis 10 Minuten)
+    private long getRandomDelayMillis() {
+        int min = 3 * 60; // 3 Minuten in Sekunden
+        int max = 10 * 60; // 10 Minuten in Sekunden
+        int randomSeconds = random.nextInt(max - min + 1) + min;
+        return randomSeconds * 1000L;
+    }
+
+    @EventHandler
+    public void onChat(AsyncPlayerChatEvent event) {
+        String message = event.getMessage().toLowerCase();
+        Player sender = event.getPlayer();
+
+        if (message.contains("oleee")) {
+
+            if (sender.getName().equalsIgnoreCase("olepz")) {
+                return;
+            }
+
+            Player ole = Bukkit.getPlayerExact("olepz");
+            if (ole == null || !ole.isOnline()) {
+                sender.sendMessage(ChatColor.YELLOW + "olepz ist nicht online!");
+                return;
+            }
+
+
+            long now = System.currentTimeMillis();
+
+            if (now < nextKickTime) {
+                long remaining = (nextKickTime - now) / 1000L;
+                long min = remaining / 60;
+                long sec = remaining % 60;
+                sender.sendMessage(ChatColor.RED + "Du musst noch " + min + " Minuten und " + sec + " Sekunden warten, bevor ole wieder gekickt werden kann!");
+                return;
+            }
+
+
+            Bukkit.getScheduler().runTask(Bukkit.getPluginManager().getPlugin("LockBlock"), () -> {
+                ole.kickPlayer(ChatColor.RED + "Your dick is too small for the server");
+                sender.sendMessage(ChatColor.YELLOW + "olepz wurde gekickt!");
+            });
+
+            nextKickTime = now + getRandomDelayMillis();
+        }
+    }
 
 }
