@@ -2,6 +2,7 @@ package de.nick.lockBlock.listener;
 
 import de.nick.lockBlock.LockBlock;
 import de.nick.lockBlock.manager.CacheManager;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -123,7 +124,7 @@ public class PlayerListener implements Listener {
         if (item.getType() == Material.TOTEM_OF_UNDYING) {
             ItemMeta meta = item.getItemMeta();
             if (meta != null) {
-                meta.setDisplayName(getRandomColorCode() + "Totem von " + playerName);
+                meta.displayName(Component.text("Totem von " + playerName));
                 item.setItemMeta(meta);
             }
         }
@@ -139,18 +140,6 @@ public class PlayerListener implements Listener {
         }
     }
 
-    private static final ChatColor[] COLORS = {
-            ChatColor.BLACK, ChatColor.DARK_BLUE, ChatColor.DARK_GREEN, ChatColor.DARK_AQUA,
-            ChatColor.DARK_RED, ChatColor.DARK_PURPLE, ChatColor.GOLD, ChatColor.GRAY,
-            ChatColor.DARK_GRAY, ChatColor.BLUE, ChatColor.GREEN, ChatColor.AQUA,
-            ChatColor.RED, ChatColor.LIGHT_PURPLE, ChatColor.YELLOW, ChatColor.WHITE
-    };
-
-    private static final Random RANDOM = new Random();
-
-    private String getRandomColorCode() {
-        return COLORS[RANDOM.nextInt(COLORS.length)].toString();
-    }
 
     /*
 
