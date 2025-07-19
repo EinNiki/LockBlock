@@ -4,6 +4,7 @@ import de.nick.lockBlock.command.LockBlockCommand;
 import de.nick.lockBlock.listener.PlayerListener;
 import de.nick.lockBlock.manager.CacheManager;
 import de.nick.lockBlock.manager.FileManager;
+import de.nick.lockBlock.utils.RecipeLoader;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -25,6 +26,7 @@ public final class LockBlock extends JavaPlugin {
         cacheManager.loadFromYML();
 
         this.getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+        new RecipeLoader().registerRecipes();
 
     }
 
